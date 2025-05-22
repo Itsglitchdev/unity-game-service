@@ -1,0 +1,19 @@
+# Unity files
+*.cs linguist-language=C#
+*.shader linguist-language=HLSL
+*.cginc linguist-language=HLSL
+*.hlsl linguist-language=HLSL
+*.compute linguist-language=HLSL
+
+# Exclude certain files from language statistics
+*.asset linguist-generated=true
+*.meta linguist-generated=true
+*.unity linguist-generated=true
+*.prefab linguist-generated=true
+*.mat linguist-generated=true
+*.controller linguist-generated=true
+*.anim linguist-generated=true
+*.overrideController linguist-generated=true
+
+# If you have specific problematic files, you can exclude them
+# path/to/problematic/file linguist-vendored=true
