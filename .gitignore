@@ -76,3 +76,13 @@ crashlytics-build.properties
 # Temporary auto-generated Android Assets
 /[Aa]ssets/[Ss]treamingAssets/aa.meta
 /[Aa]ssets/[Ss]treamingAssets/aa/*
+
+
+# Additional Unity ignores
+*.tmp
+*.bak
+*.swp
+*~.nib
+*.pbxuser
+*.perspective
+*.perspectivev3
