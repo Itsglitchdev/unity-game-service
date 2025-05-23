@@ -9,32 +9,36 @@ public class GameMenuManager : MonoBehaviour
     [SerializeField] private Button signOutButton;
     [Header("Text")]
     [SerializeField] private TextMeshProUGUI playerNameText;
-    
+
     private void Start()
     {
         signOutButton.onClick.AddListener(OnSignOutButtonClicked);
         UpdatePlayerInfo();
     }
-    
+
     private void UpdatePlayerInfo()
     {
         if (AuthenticationService.Instance.IsSignedIn)
         {
-            string playerId = AuthenticationService.Instance.PlayerId;
-            
-            if (playerNameText != null)
-                playerNameText.text = $"Guest_{playerId.Substring(0, 4)}"; // Show first 4 characters
-            
-            Debug.Log($"Player signed in with ID: {playerId}");
+            var playerInfo = AuthenticationService.Instance.PlayerInfo;
+            if (!string.IsNullOrEmpty(playerInfo.Username))
+            {
+                playerNameText.text = playerInfo.Username;
+            }
+            else
+            {
+                string playerId = AuthenticationService.Instance.PlayerId;
+                playerNameText.text = $"Player_{playerId.Substring(0, 4)}";
+            }
         }
         else
         {
             if (playerNameText != null)
                 playerNameText.text = "Not signed in";
-            
+
         }
     }
-    
+
     private void OnSignOutButtonClicked()
     {
         try
@@ -48,17 +52,17 @@ public class GameMenuManager : MonoBehaviour
             Debug.LogError($"Sign out failed: {ex.Message}");
         }
     }
-    
+
     public string GetPlayerName()
     {
         if (AuthenticationService.Instance.IsSignedIn)
         {
             string playerId = AuthenticationService.Instance.PlayerId;
-            return $"Guest_{playerId.Substring(0, 4)}";
+            return $"Player_{playerId.Substring(0, 4)}";
         }
         return "Unknown Player";
     }
-    
+
     public bool IsPlayerAuthenticated()
     {
         return AuthenticationService.Instance.IsSignedIn;
