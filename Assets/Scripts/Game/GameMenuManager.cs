@@ -7,12 +7,20 @@ public class GameMenuManager : MonoBehaviour
 {
     [Header("Buttons")]
     [SerializeField] private Button signOutButton;
+
     [Header("Text")]
     [SerializeField] private TextMeshProUGUI playerNameText;
+
+    private const string LogoutKey = "UserLoggedOut";
 
     private void Start()
     {
         signOutButton.onClick.AddListener(OnSignOutButtonClicked);
+        UpdatePlayerInfo();
+    }
+
+    private void OnEnable()
+    {
         UpdatePlayerInfo();
     }
 
@@ -21,21 +29,21 @@ public class GameMenuManager : MonoBehaviour
         if (AuthenticationService.Instance.IsSignedIn)
         {
             var playerInfo = AuthenticationService.Instance.PlayerInfo;
-            if (!string.IsNullOrEmpty(playerInfo.Username))
+
+            if (string.IsNullOrEmpty(playerInfo?.Username))
             {
-                playerNameText.text = playerInfo.Username;
+                string playerId = AuthenticationService.Instance.PlayerId;
+                playerNameText.text = $"Guest_{playerId.Substring(0, 6)}";
             }
             else
             {
-                string playerId = AuthenticationService.Instance.PlayerId;
-                playerNameText.text = $"Player_{playerId.Substring(0, 4)}";
+                playerNameText.text = playerInfo.Username;
             }
         }
         else
         {
-            if (playerNameText != null)
-                playerNameText.text = "Not signed in";
-
+            playerNameText.text = "Not signed in";
+            SceneLoader.LoadScene(SceneName.MainMenu);
         }
     }
 
@@ -43,28 +51,17 @@ public class GameMenuManager : MonoBehaviour
     {
         try
         {
-            AuthenticationService.Instance.SignOut();
-            Debug.Log("Player signed out successfully");
+            AuthenticationService.Instance.SignOut(true);
+
+            PlayerPrefs.SetInt(LogoutKey, 1); // Mark as logged out
+            PlayerPrefs.Save();
+
+            playerNameText.text = "Signing out...";
             SceneLoader.LoadScene(SceneName.MainMenu);
         }
         catch (System.Exception ex)
         {
             Debug.LogError($"Sign out failed: {ex.Message}");
         }
-    }
-
-    public string GetPlayerName()
-    {
-        if (AuthenticationService.Instance.IsSignedIn)
-        {
-            string playerId = AuthenticationService.Instance.PlayerId;
-            return $"Player_{playerId.Substring(0, 4)}";
-        }
-        return "Unknown Player";
-    }
-
-    public bool IsPlayerAuthenticated()
-    {
-        return AuthenticationService.Instance.IsSignedIn;
     }
 }
