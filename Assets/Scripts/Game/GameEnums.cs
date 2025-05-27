@@ -2,5 +2,6 @@ public enum SceneName
 {
     MainMenu,
     Loading,
-    GameMenu
+    GameMenu,
+    HelixDrift
 }

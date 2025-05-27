@@ -240,6 +240,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   signOutButton: {fileID: 1261753777}
+  helixDriftButton: {fileID: 613795917}
   playerNameText: {fileID: 1381304994}
 --- !u!1 &330585543
 GameObject:
@@ -595,7 +596,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.14901961, g: 0.14901961, b: 0.3019608, a: 1}
+  m_Color: {r: 0.050980393, g: 0.050980393, b: 0.16862746, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -677,7 +678,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Hexa Dash
+  m_text: Helix Drift
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: b9c4506975ab58d44a5e573ff4c51034, type: 2}
   m_sharedMaterial: {fileID: -8098037315330084357, guid: b9c4506975ab58d44a5e573ff4c51034, type: 2}
@@ -686,8 +687,8 @@ MonoBehaviour:
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4294967295
-  m_fontColor: {r: 1, g: 1, b: 1, a: 1}
+    rgba: 4294959328
+  m_fontColor: {r: 0.8784314, g: 0.8784314, b: 1, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:

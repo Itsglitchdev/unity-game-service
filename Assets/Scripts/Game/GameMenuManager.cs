@@ -7,6 +7,7 @@ public class GameMenuManager : MonoBehaviour
 {
     [Header("Buttons")]
     [SerializeField] private Button signOutButton;
+    [SerializeField] private Button helixDriftButton;
 
     [Header("Text")]
     [SerializeField] private TextMeshProUGUI playerNameText;
@@ -16,6 +17,7 @@ public class GameMenuManager : MonoBehaviour
     private void Start()
     {
         signOutButton.onClick.AddListener(OnSignOutButtonClicked);
+        helixDriftButton.onClick.AddListener(OnHelixDriftButtonClicked);
         UpdatePlayerInfo();
     }
 
@@ -64,4 +66,6 @@ public class GameMenuManager : MonoBehaviour
             Debug.LogError($"Sign out failed: {ex.Message}");
         }
     }
+
+    private void OnHelixDriftButtonClicked() => SceneLoader.LoadScene(SceneName.HelixDrift);
 }
