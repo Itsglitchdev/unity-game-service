@@ -2,12 +2,20 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using Unity.Services.Authentication;
+using System;
 
 public class GameMenuManager : MonoBehaviour
 {
-    [Header("Buttons")]
+    [Header("NavigationButtons")]
     [SerializeField] private Button signOutButton;
+    [SerializeField] private Button leaderboardButton;
+
+    [Header("GameButtons")]
     [SerializeField] private Button helixDriftButton;
+
+    [Header("UI Panels")]
+    [SerializeField] private GameObject gameListPanel;
+    [SerializeField] private GameObject leaderboardPanel;
 
     [Header("Text")]
     [SerializeField] private TextMeshProUGUI playerNameText;
@@ -16,9 +24,18 @@ public class GameMenuManager : MonoBehaviour
 
     private void Start()
     {
+        EventListners();
+        UpdatePlayerInfo();
+        gameListPanel.SetActive(true);
+        leaderboardPanel.SetActive(false);
+    }
+
+    private void EventListners()
+    {
         signOutButton.onClick.AddListener(OnSignOutButtonClicked);
         helixDriftButton.onClick.AddListener(OnHelixDriftButtonClicked);
-        UpdatePlayerInfo();
+        leaderboardButton.onClick.AddListener(OnLeaderboardButtonClicked);
+
     }
 
     private void OnEnable()
@@ -35,7 +52,7 @@ public class GameMenuManager : MonoBehaviour
             if (string.IsNullOrEmpty(playerInfo?.Username))
             {
                 string playerId = AuthenticationService.Instance.PlayerId;
-                playerNameText.text = $"Guest_{playerId.Substring(0, 6)}";
+                playerNameText.text = $"Guest_{playerId.Substring(0, 4)}";
             }
             else
             {
@@ -68,4 +85,11 @@ public class GameMenuManager : MonoBehaviour
     }
 
     private void OnHelixDriftButtonClicked() => SceneLoader.LoadScene(SceneName.HelixDrift);
+
+    private void OnLeaderboardButtonClicked()
+    {
+        gameListPanel.SetActive(!gameListPanel.activeSelf);
+        leaderboardPanel.SetActive(!leaderboardPanel.activeSelf);
+           
+    }
 }

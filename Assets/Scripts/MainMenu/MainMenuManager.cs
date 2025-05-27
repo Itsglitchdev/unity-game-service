@@ -5,6 +5,8 @@ using Unity.Services.Core;
 using Unity.Services.Authentication;
 using UnityEngine.SceneManagement;
 using System.Threading.Tasks;
+using Unity.Services.Authentication.PlayerAccounts;
+
 
 public class MainMenuManager : MonoBehaviour
 {
@@ -116,6 +118,9 @@ public class MainMenuManager : MonoBehaviour
             await AuthenticationService.Instance.SignInWithUsernamePasswordAsync(
                 usernameInputField.text, passwordInputField.text);
 
+            // ✅ Set PlayerName to username
+            await AuthenticationService.Instance.UpdatePlayerNameAsync(usernameInputField.text);
+
             PlayerPrefs.SetInt(LogoutKey, 0);
             PlayerPrefs.Save();
 
@@ -169,6 +174,9 @@ public class MainMenuManager : MonoBehaviour
 
             AuthenticationService.Instance.SignOut(true); // Clear any session
             await AuthenticationService.Instance.SignUpWithUsernamePasswordAsync(username, password);
+
+            // ✅ Set PlayerName to username
+            await AuthenticationService.Instance.UpdatePlayerNameAsync(username);
 
             PlayerPrefs.SetInt(LogoutKey, 0);
             PlayerPrefs.Save();

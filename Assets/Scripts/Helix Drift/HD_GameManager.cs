@@ -2,6 +2,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using System.Collections;
+using Unity.Services.Leaderboards;
 
 public class HD_GameManager : MonoBehaviour
 {
@@ -34,6 +35,7 @@ public class HD_GameManager : MonoBehaviour
 
     private float scoreTimer;
     private const string HIGHSCOREKEY = "HighScore";
+    private const string PLAYFLARE = "Play_Flare";
 
     private void Awake()
     {
@@ -52,7 +54,7 @@ public class HD_GameManager : MonoBehaviour
     {
         if (playerScript == null)
             playerScript = GetComponent<HD_Player>();
-            
+
         ShowTapToPlay();
     }
 
@@ -96,7 +98,7 @@ public class HD_GameManager : MonoBehaviour
     private void ShowTapToPlay()
     {
         isGamePlaying = false;
-        
+
         if (tapToPlayText != null)
         {
             tapToPlayText.gameObject.SetActive(true);
@@ -112,13 +114,13 @@ public class HD_GameManager : MonoBehaviour
     public void StartGame()
     {
         Debug.Log("Starting Game");
-        
+
         isGamePlaying = true;
         currentScore = 0;
         scoreTimer = 0f;
         coinTimer = 0f;
         activeCoins = 0;
-        
+
         if (tapToPlayText != null)
             tapToPlayText.gameObject.SetActive(false);
 
@@ -152,10 +154,10 @@ public class HD_GameManager : MonoBehaviour
             bestScoreText.text = "Best: " + highScore.ToString();
     }
 
-    public void GameOver()
+    public async void GameOver()
     {
         Debug.Log("Game Over");
-        
+
         isGamePlaying = false;
         StopAllCoroutines();
 
@@ -165,6 +167,9 @@ public class HD_GameManager : MonoBehaviour
             PlayerPrefs.SetInt(HIGHSCOREKEY, highScore);
             PlayerPrefs.Save();
         }
+
+        // Update Leaderboard
+        await LeaderboardsService.Instance.AddPlayerScoreAsync(PLAYFLARE, highScore);
 
         ShowGameOverPanel();
     }
@@ -211,7 +216,7 @@ public class HD_GameManager : MonoBehaviour
     public void RestartGame()
     {
         Debug.Log("Restarting Game");
-        
+
         StopAllCoroutines();
         ClearCoins();
 
@@ -221,5 +226,10 @@ public class HD_GameManager : MonoBehaviour
         ResetAllObstacles();
         Init();
         ShowTapToPlay();
+    }
+    
+    public void HomeMenu()
+    {
+        SceneLoader.LoadScene(SceneName.GameMenu);
     }
 }
