@@ -3,6 +3,8 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using System.Collections;
 using Unity.Services.Leaderboards;
+using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
 public class HD_GameManager : MonoBehaviour
 {
@@ -10,6 +12,7 @@ public class HD_GameManager : MonoBehaviour
 
     [Header("Game State")]
     public bool isGamePlaying = false;
+    public bool isGameOver = false; 
     public int currentScore = 0;
     public int highScore = 0;
 
@@ -28,6 +31,8 @@ public class HD_GameManager : MonoBehaviour
 
     [Header("Game Settings")]
     [SerializeField] private float scoreTimeInterval = 1f;
+    [SerializeField] private Button homeButton;
+    [SerializeField] private Button retryButton;
 
     [Header("References")]
     [SerializeField] private HD_Player playerScript;
@@ -55,14 +60,24 @@ public class HD_GameManager : MonoBehaviour
         if (playerScript == null)
             playerScript = GetComponent<HD_Player>();
 
+        EventListeners();
         ShowTapToPlay();
     }
 
+    private void EventListeners()
+    { 
+        homeButton.onClick.AddListener(HomeMenu);
+        retryButton.onClick.AddListener(RestartGame);
+    }
     private void Update()
     {
-        if (!isGamePlaying && Input.GetMouseButtonDown(0))
+        if (!isGamePlaying && !isGameOver && Input.GetMouseButtonDown(0))
         {
-            StartGame();
+            // Check if we're not clicking on UI
+            if (!IsPointerOverUIElement())
+            {
+                StartGame();
+            }
         }
 
         if (isGamePlaying)
@@ -83,6 +98,12 @@ public class HD_GameManager : MonoBehaviour
         }
     }
 
+    private bool IsPointerOverUIElement()
+    {
+        if (EventSystem.current == null) return false;
+        return EventSystem.current.IsPointerOverGameObject();
+    }
+
     private void Init()
     {
         currentScore = 0;
@@ -90,6 +111,7 @@ public class HD_GameManager : MonoBehaviour
         coinTimer = 0f;
         activeCoins = 0;
         isGamePlaying = false;
+        isGameOver = false; 
 
         highScore = PlayerPrefs.GetInt(HIGHSCOREKEY, 0);
         UpdateScoreUI();
@@ -98,6 +120,7 @@ public class HD_GameManager : MonoBehaviour
     private void ShowTapToPlay()
     {
         isGamePlaying = false;
+        isGameOver = false;  
 
         if (tapToPlayText != null)
         {
@@ -116,6 +139,7 @@ public class HD_GameManager : MonoBehaviour
         Debug.Log("Starting Game");
 
         isGamePlaying = true;
+        isGameOver = false; 
         currentScore = 0;
         scoreTimer = 0f;
         coinTimer = 0f;
@@ -159,6 +183,7 @@ public class HD_GameManager : MonoBehaviour
         Debug.Log("Game Over");
 
         isGamePlaying = false;
+        isGameOver = true;  
         StopAllCoroutines();
 
         if (currentScore > highScore)
@@ -167,11 +192,11 @@ public class HD_GameManager : MonoBehaviour
             PlayerPrefs.SetInt(HIGHSCOREKEY, highScore);
             PlayerPrefs.Save();
         }
+        ShowGameOverPanel();
 
         // Update Leaderboard
         await LeaderboardsService.Instance.AddPlayerScoreAsync(PLAYFLARE, highScore);
 
-        ShowGameOverPanel();
     }
 
     private void ShowGameOverPanel()
@@ -213,23 +238,21 @@ public class HD_GameManager : MonoBehaviour
         }
     }
 
-    public void RestartGame()
+    private void RestartGame()
     {
         Debug.Log("Restarting Game");
-
+        
+        // Stop all processes
+        // Time.timeScale = 1f; // Ensure normal time scale
         StopAllCoroutines();
-        ClearCoins();
-
-        if (playerScript != null)
-            playerScript.ResetPlayer();
-
-        ResetAllObstacles();
-        Init();
-        ShowTapToPlay();
+        
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
     
-    public void HomeMenu()
+    private void HomeMenu()
     {
+        // Ensure normal time scale before changing scenes
+        // Time.timeScale = 1f;
         SceneLoader.LoadScene(SceneName.GameMenu);
     }
 }

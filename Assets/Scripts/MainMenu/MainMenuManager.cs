@@ -30,11 +30,10 @@ public class MainMenuManager : MonoBehaviour
 
         bool userLoggedOut = PlayerPrefs.GetInt(LogoutKey, 0) == 1;
 
-        try
+        if (!userLoggedOut && AuthenticationService.Instance.SessionTokenExists)
         {
-            if (!userLoggedOut)
+            try
             {
-                // This will trigger Unity to try to restore session if token is valid
                 await AuthenticationService.Instance.SignInAnonymouslyAsync();
 
                 if (AuthenticationService.Instance.IsSignedIn)
@@ -50,14 +49,14 @@ public class MainMenuManager : MonoBehaviour
                     return;
                 }
             }
-        }
-        catch (AuthenticationException ex)
-        {
-            signInAsGuestButton.interactable = true;
-            signIn.interactable = true;
-            signUp.interactable = true;
-            Debug.Log("Session restore failed: " + ex.Message);
-            PlayerPrefs.SetInt(LogoutKey, 1);
+            catch (AuthenticationException ex)
+            {
+                signInAsGuestButton.interactable = true;
+                signIn.interactable = true;
+                signUp.interactable = true;
+                Debug.Log("Session restore failed: " + ex.Message);
+                PlayerPrefs.SetInt(LogoutKey, 1); // Session invalid, treat as logged out
+            }
         }
 
         passwordInputField.contentType = TMP_InputField.ContentType.Password;
