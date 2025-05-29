@@ -35,7 +35,6 @@ public class GameMenuManager : MonoBehaviour
         signOutButton.onClick.AddListener(OnSignOutButtonClicked);
         helixDriftButton.onClick.AddListener(OnHelixDriftButtonClicked);
         leaderboardButton.onClick.AddListener(OnLeaderboardButtonClicked);
-
     }
 
     private void OnEnable()
@@ -51,8 +50,17 @@ public class GameMenuManager : MonoBehaviour
 
             if (string.IsNullOrEmpty(playerInfo?.Username))
             {
-                string playerId = AuthenticationService.Instance.PlayerId;
-                playerNameText.text = $"Guest_{playerId.Substring(0, 4)}";
+                // For anonymous users, use the PlayerName if set, otherwise generate consistent guest name
+                string playerName = AuthenticationService.Instance.PlayerName;
+                if (!string.IsNullOrEmpty(playerName))
+                {
+                    playerNameText.text = playerName;
+                }
+                else
+                {
+                    string playerId = AuthenticationService.Instance.PlayerId;
+                    playerNameText.text = GetConsistentGuestName(playerId);
+                }
             }
             else
             {
@@ -64,6 +72,11 @@ public class GameMenuManager : MonoBehaviour
             playerNameText.text = "Not signed in";
             SceneLoader.LoadScene(SceneName.MainMenu);
         }
+    }
+
+    private string GetConsistentGuestName(string playerId)
+    {
+        return $"Player_{playerId.Substring(0, 2)}";
     }
 
     private void OnSignOutButtonClicked()
@@ -90,6 +103,5 @@ public class GameMenuManager : MonoBehaviour
     {
         gameListPanel.SetActive(!gameListPanel.activeSelf);
         leaderboardPanel.SetActive(!leaderboardPanel.activeSelf);
-           
     }
 }

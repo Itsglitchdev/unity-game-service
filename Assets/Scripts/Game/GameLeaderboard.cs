@@ -18,29 +18,51 @@ public class GameLeaderboard : MonoBehaviour
 
     private async Task LoadLeaderboard()
     {
-        // Fetch leaderboard entries (Top 25)
-        var scoresResponse = await LeaderboardsService.Instance.GetScoresAsync(
-            LEADERBOARD_ID,
-            new GetScoresOptions { Limit = 25 }
-        );
-
-        // Clear old leaderboard items
-        foreach (Transform child in gameLeaderBoardPanelParent.transform)
+        try
         {
-            Destroy(child.gameObject);
-        }
+            // Fetch leaderboard entries (Top 25)
+            var scoresResponse = await LeaderboardsService.Instance.GetScoresAsync(
+                LEADERBOARD_ID,
+                new GetScoresOptions { Limit = 25 }
+            );
 
-        // Instantiate new leaderboard items
-        foreach (var entry in scoresResponse.Results)
+            // Clear old leaderboard items
+            foreach (Transform child in gameLeaderBoardPanelParent.transform)
+            {
+                Destroy(child.gameObject);
+            }
+
+            // Instantiate new leaderboard items
+            foreach (var entry in scoresResponse.Results)
+            {
+                GameObject item = Instantiate(gameLeaderBoardItemPrefab, gameLeaderBoardPanelParent.transform);
+                GameLeaderBoardItem leaderboardItem = item.GetComponent<GameLeaderBoardItem>();
+
+                string displayName = GetDisplayName(entry);
+
+                leaderboardItem.SetItem((entry.Rank + 1).ToString(), displayName, entry.Score.ToString());
+            }
+        }
+        catch (System.Exception ex)
         {
-            GameObject item = Instantiate(gameLeaderBoardItemPrefab, gameLeaderBoardPanelParent.transform);
-            GameLeaderBoardItem leaderboardItem = item.GetComponent<GameLeaderBoardItem>();
-
-            string displayName = string.IsNullOrEmpty(entry.PlayerName)
-                ? $"Guest_{entry.PlayerId.Substring(0, 4)}"
-                : entry.PlayerName;
-
-            leaderboardItem.SetItem((entry.Rank + 1).ToString(), displayName, entry.Score.ToString());
+            Debug.LogError($"Failed to load leaderboard: {ex.Message}");
         }
+    }
+
+    private string GetDisplayName(Unity.Services.Leaderboards.Models.LeaderboardEntry entry)
+    {
+        // Priority: PlayerName > Username > Generated Guest Name
+        if (!string.IsNullOrEmpty(entry.PlayerName))
+        {
+            return entry.PlayerName;
+        }
+        
+        // Fallback: Generate consistent guest name using PlayerId
+        return GetConsistentGuestName(entry.PlayerId);
+    }
+
+    private string GetConsistentGuestName(string playerId)
+    {
+        return $"Player_{playerId.Substring(0, 2)}";
     }
 }
